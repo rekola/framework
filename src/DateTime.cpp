@@ -6,22 +6,18 @@
 #include <cstring>
 #include <cctype>
 
-#include <sys/time.h>
-
+#ifdef WIN32
+#include <windows.h>
+#include <sysinfoapi.h>
+#endif
 
 #ifdef WIN32
-#include "win32/strptime.h"
+// #include "win32/strptime.h"
+#else
+#include <sys/time.h>
 #endif
 
 using namespace std;
-
-#if 0
-extern char * tzname[2];
-extern long timezone;
-extern int daylight;
-#endif
-
-static const char month_names[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
 
 // true for an optionally signed sequence of digits, e.g. "+0200"
 static bool isSignedNumber(const char * s) {
@@ -32,6 +28,14 @@ static bool isSignedNumber(const char * s) {
   }
   return true;
 }
+
+#if 0
+extern char * tzname[2];
+extern long timezone;
+extern int daylight;
+#endif
+
+static const char month_names[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
 
 #ifndef WIN32
 #define _snscanf(input, size, format, ...) sscanf(input, format, __VA_ARGS__)
@@ -60,17 +64,17 @@ DateTime::Gmtime(const time_t * timep, struct tm * result) {
 #endif
 }
 
-DateTime::DateTime() : year(0), month(0), day(0), hour(0), min(0), sec(0), tz_offset(-30000), day_of_week(-1), is_valid(false)
+DateTime::DateTime() : year(0), month(0), day(0), hour(0), min_(0), sec(0), tz_offset(-30000), day_of_week(-1), is_valid(false)
 {
   
 }
 
-DateTime::DateTime(int _year, int _month, int _day, int _hour, int _min, int _sec, TimezoneSelector tz_sel)
+DateTime::DateTime(int _year, int _month, int _day, int _hour, int min, int _sec, TimezoneSelector tz_sel)
   : year(_year),
     month(_month),
     day(_day),
     hour(_hour),
-    min(_min),
+    min_(min),
     sec(_sec),
     tz_offset(tz_sel == UTC ? 0 : -30000),
     day_of_week(-1),
@@ -121,7 +125,7 @@ DateTime::parseRSSTime(const string & s) {
       // parse EST
       tz_offset = 0;
     }
-    year = yy; day = dd; hour = hh; min = mm; sec = ss;
+    year = yy; day = dd; hour = hh; min_ = mm; sec = ss;
     const char * r = strstr(month_names, s_month);
     if (r) {
       month = 1 + (r - month_names) / 3;
@@ -130,7 +134,7 @@ DateTime::parseRSSTime(const string & s) {
     }
   }
 
-  year = month = day = hour = min = sec = 0;
+  year = month = day = hour = min_ = sec = 0;
   is_valid = false;
   
   return false;  
@@ -151,7 +155,7 @@ DateTime::parseHTTPTime(const string & s) {
 
   if (rv == 8) {
     tz_offset = int(tz / 100) * 60; // minutes?
-    year = yy; day = dd; hour = hh; min = mm; sec = ss;
+    year = yy; day = dd; hour = hh; min_ = mm; sec = ss;
     const char * r = strstr(month_names, s_month);
     if (r) {
       month = 1 + (r - month_names) / 3;
@@ -160,7 +164,7 @@ DateTime::parseHTTPTime(const string & s) {
     }
   }
 
-  year = month = day = hour = min = sec = 0;
+  year = month = day = hour = min_ = sec = 0;
   is_valid = false;
   
   return false;
@@ -195,9 +199,9 @@ DateTime::parseISOTime(const string & s) {
   }
   is_valid = success;
   if (success) {
-    year = yy; month = mo; day = dd; hour = hh; min = mi; sec = ss; tz_offset = timezone;
+    year = yy; month = mo; day = dd; hour = hh; min_ = mi; sec = ss; tz_offset = timezone;
   } else {
-    year = month = day = hour = min = sec = 0;
+    year = month = day = hour = min_ = sec = 0;
   }
   return *this;
 }
@@ -209,10 +213,10 @@ DateTime::parseISODate(const string & s) {
   int yy, mo, dd;
   int rv = _snscanf(s.c_str(), s.size(), "%d-%d-%d", &yy, &mo, &dd);
   if (rv == 3) {
-    year = yy; month = mo; day = dd; hour = 0; min = 0; sec = 0;
+    year = yy; month = mo; day = dd; hour = 0; min_ = 0; sec = 0;
     return true;
   } else {
-    year = month = day = hour = min = sec = 0;
+    year = month = day = hour = min_ = sec = 0;
     return false;
   }
 }
@@ -221,7 +225,7 @@ void
 DateTime::setTime(const string & s) {
   assert(s.size());
 #ifdef WIN32
-  year = month = day = hour = min = sec = 0;
+  year = month = day = hour = min_ = sec = 0;
 #else
   struct tm tm;
   memset(&tm, 0, sizeof(struct tm));
@@ -254,7 +258,7 @@ DateTime::setTime(const string & s) {
   month = 1 + tm.tm_mon;
   day = tm.tm_mday;
   hour = tm.tm_hour;
-  min = tm.tm_min;
+  min_ = tm.tm_min;
   sec = tm.tm_sec;
 #ifdef WIN32
   tz_offset = 0; // FIX
@@ -298,13 +302,13 @@ DateTime::setTimeLocal(time_t t) {
     month = ts.tm_mon + 1;
     day = ts.tm_mday;
     hour = ts.tm_hour;
-    min = ts.tm_min;
+    min_ = ts.tm_min;
     sec = ts.tm_sec;
     day_of_week = (ts.tm_wday + 6) % 7 + 1;
     tz_offset = get_timezone_offset();
     is_valid = true;
   } else {
-    year = month = day = hour = min = sec = 0;    
+    year = month = day = hour = min_ = sec = 0;    
     day_of_week = -1;
     tz_offset = 0;
     is_valid = false;
@@ -319,13 +323,13 @@ DateTime::setTimeUTC(time_t t) {
     month = ts.tm_mon + 1;
     day = ts.tm_mday;
     hour = ts.tm_hour;
-    min = ts.tm_min;
+    min_ = ts.tm_min;
     sec = ts.tm_sec;
     day_of_week = (ts.tm_wday + 6) % 7 + 1;
     tz_offset = 0;
     is_valid = true;
   } else {
-    year = month = day = hour = min = sec = 0;    
+    year = month = day = hour = min_ = sec = 0;    
     day_of_week = -1;
     tz_offset = 0;
     is_valid = false;
@@ -369,7 +373,7 @@ time_t
 DateTime::getUnixTime() const {
   tm tt;
   tt.tm_sec = sec;
-  tt.tm_min = min;
+  tt.tm_min = min_;
   tt.tm_hour = hour;
   tt.tm_mday = day;
   tt.tm_mon = month - 1;
@@ -407,7 +411,7 @@ DateTime::get_timezone_offset() {
 string
 DateTime::toString() const {
   char s[256];
-  snprintf(s, 255, "%d.%d.%d %02d:%02d:%02d", day, month, year, hour, min, sec);
+  snprintf(s, 255, "%d.%d.%d %02d:%02d:%02d", day, month, year, hour, min_, sec);
   return string(s);
 }
 
@@ -421,14 +425,14 @@ DateTime::dateToString() const {
 string
 DateTime::toISOStringSimple() const {
   char s[256];
-  snprintf(s, 255, "%04d-%02d-%02d %02d:%02d:%02d", year, month, day, hour, min, sec);
+  snprintf(s, 255, "%04d-%02d-%02d %02d:%02d:%02d", year, month, day, hour, min_, sec);
   return string(s);
 }
 
 string
 DateTime::toISOStringTZ() const {
   char s[256];
-  snprintf(s, 255, "%04d-%02d-%02dT%02d:%02d:%02d", year, month, day, hour, min, sec);
+  snprintf(s, 255, "%04d-%02d-%02dT%02d:%02d:%02d", year, month, day, hour, min_, sec);
   string r(s);
   if (tz_offset == 0) r += 'Z';
   else if (tz_offset != -30000) {
@@ -449,7 +453,7 @@ DateTime &
 DateTime::normalize() {
   tm tt;
   tt.tm_sec = sec;
-  tt.tm_min = min;
+  tt.tm_min = min_;
   tt.tm_hour = hour;
   tt.tm_mday = day;
   tt.tm_mon = month - 1;
@@ -459,7 +463,7 @@ DateTime::normalize() {
   tt.tm_isdst = -1;  
   mktime(&tt);
   sec = tt.tm_sec;
-  min = tt.tm_min;
+  min_ = tt.tm_min;
   hour = tt.tm_hour;
   day = tt.tm_mday;
   month = tt.tm_mon + 1;
@@ -469,6 +473,9 @@ DateTime::normalize() {
 
 double
 DateTime::getCurrentTime() {
+#ifdef WIN32
+  return now() / 1000.0;
+#else
   struct timeval tv;
   int r = gettimeofday(&tv, 0);
   if (r == 0) {
@@ -476,10 +483,18 @@ DateTime::getCurrentTime() {
   } else {
     return 0;
   }
+#endif
 }
 
 long long
 DateTime::now() {
+#ifdef WIN32
+   FILETIME ft_now;
+   GetSystemTimeAsFileTime(&ft_now);
+   long long ll_now = (LONGLONG)ft_now.dwLowDateTime + (((LONGLONG)ft_now.dwHighDateTime) << 32LL);
+   ll_now /= 10000;
+   return ll_now - 116444736000000000LL;
+#else
   struct timeval tv;
   int r = gettimeofday(&tv, 0);
   if (r == 0) {
@@ -487,4 +502,5 @@ DateTime::now() {
   } else {
     return 0;
   }
+#endif
 }
