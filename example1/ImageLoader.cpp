@@ -2,7 +2,6 @@
 
 #include <PlatformThread.h>
 #include <ImageResponseEvent.h>
-#include <StringUtils.h>
 
 #include <URI.h>
 #include <HTTPClient.h>

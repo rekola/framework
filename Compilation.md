@@ -10,7 +10,6 @@ Clone repositories _framework_, _canvas_ and _httpclient_. Create xCode project 
 framework/example1/Example1.cpp
 framework/example1/ImageLoader.cpp
 framework/src/DateTime.cpp
-framework/src/StringUtils.cpp
 framework/src/EventHandler.cpp
 framework/src/Element.cpp
 framework/src/Selection.cpp
