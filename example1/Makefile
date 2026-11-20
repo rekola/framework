@@ -34,7 +34,6 @@ CPPDEPS = -MT$@ -MF`echo $@ | sed -e 's,\.o$$,.d,'` -MD -MP
 OBJECTS = \
 	Example1.o \
 	../src/DateTime.o \
-	../src/StringUtils.o \
 	../src/EventHandler.o \
 	../src/Element.o \
 	../src/Selection.o \

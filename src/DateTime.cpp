@@ -4,10 +4,10 @@
 #include <cassert>
 #include <ctime>
 #include <cstring>
+#include <cctype>
 
 #include <sys/time.h>
 
-#include "StringUtils.h"
 
 #ifdef WIN32
 #include "win32/strptime.h"
@@ -22,6 +22,16 @@ extern int daylight;
 #endif
 
 static const char month_names[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
+
+// true for an optionally signed sequence of digits, e.g. "+0200"
+static bool isSignedNumber(const char * s) {
+  if (!*s) return false;
+  if (!isdigit((unsigned char)s[0]) && s[0] != '+' && s[0] != '-') return false;
+  for (s++; *s; s++) {
+    if (!isdigit((unsigned char)*s)) return false;
+  }
+  return true;
+}
 
 #ifndef WIN32
 #define _snscanf(input, size, format, ...) sscanf(input, format, __VA_ARGS__)
@@ -104,7 +114,7 @@ DateTime::parseRSSTime(const string & s) {
     success = _snscanf(s.c_str(), s.size(), "%d %s %d %d:%d:%d %s", &dd, s_month, &yy, &hh, &mm, &ss, tz_text) == 7;
   }
   if (success) {
-    if (StringUtils::isNumber(tz_text)) {
+    if (isSignedNumber(tz_text)) {
       int tz = atoi(tz_text);
       tz_offset = int(tz / 100) * 60; // minutes?
     } else {

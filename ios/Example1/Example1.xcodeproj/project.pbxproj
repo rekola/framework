@@ -11,7 +11,6 @@
 		26738C1D1FC5E0C300E24663 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26738C1C1FC5E0C300E24663 /* Assets.xcassets */; };
 		26738C201FC5E0C300E24663 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 26738C1E1FC5E0C300E24663 /* LaunchScreen.storyboard */; };
 		26738C231FC5E0C300E24663 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 26738C221FC5E0C300E24663 /* main.m */; };
-		26738C371FC5E15100E24663 /* StringUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26738C2D1FC5E15100E24663 /* StringUtils.cpp */; };
 		26738C381FC5E15100E24663 /* DateTime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26738C2E1FC5E15100E24663 /* DateTime.cpp */; };
 		26738C391FC5E15100E24663 /* EventHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26738C2F1FC5E15100E24663 /* EventHandler.cpp */; };
 		26738C3B1FC5E15100E24663 /* FWApplication.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26738C311FC5E15100E24663 /* FWApplication.cpp */; };
@@ -57,7 +56,6 @@
 		26738C1F1FC5E0C300E24663 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		26738C211FC5E0C300E24663 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		26738C221FC5E0C300E24663 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		26738C2D1FC5E15100E24663 /* StringUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = StringUtils.cpp; path = ../../../../../src/StringUtils.cpp; sourceTree = "<group>"; };
 		26738C2E1FC5E15100E24663 /* DateTime.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DateTime.cpp; path = ../../../../../src/DateTime.cpp; sourceTree = "<group>"; };
 		26738C2F1FC5E15100E24663 /* EventHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EventHandler.cpp; path = ../../../../../src/EventHandler.cpp; sourceTree = "<group>"; };
 		26738C311FC5E15100E24663 /* FWApplication.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FWApplication.cpp; path = ../../../../../src/FWApplication.cpp; sourceTree = "<group>"; };
@@ -236,7 +234,6 @@
 				26738C351FC5E15100E24663 /* PosixThread.cpp */,
 				26738C361FC5E15100E24663 /* Runnable.cpp */,
 				26738C321FC5E15100E24663 /* Selection.cpp */,
-				26738C2D1FC5E15100E24663 /* StringUtils.cpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -343,7 +340,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				26738C471FC5E16C00E24663 /* AppDelegate.m in Sources */,
-				26738C371FC5E15100E24663 /* StringUtils.cpp in Sources */,
 				26738C671FC5E1B200E24663 /* SHA1.cpp in Sources */,
 				26738C681FC5E1B200E24663 /* OAuth.cpp in Sources */,
 				26738C721FC5E33F00E24663 /* Example1.cpp in Sources */,

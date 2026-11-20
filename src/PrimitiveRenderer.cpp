@@ -3,7 +3,7 @@
 #include <VBO.h>
 #include <OpenGLTexture.h>
 
-#include <StringUtils.h>
+#include <sstream>
 #include <cstdlib>
 
 using namespace std;
@@ -23,6 +23,14 @@ static set<int> readCompressedFormats() {
   return r;
 }
 
+static vector<string> splitWhitespace(const string & s) {
+  vector<string> v;
+  istringstream in(s);
+  string token;
+  while (in >> token) v.push_back(token);
+  return v;
+}
+
 static set<string> readExtensions() {
   set<string> r;
 #if 0
@@ -38,7 +46,7 @@ static set<string> readExtensions() {
   auto es = glGetString(GL_EXTENSIONS);
   assert(es);
   if (es) {
-    auto ev = StringUtils::split(string((const char *)es), ' ');
+    auto ev = splitWhitespace((const char *)es);
     for (auto & e : ev) {
       r.insert(e);
     }
@@ -116,7 +124,7 @@ PrimitiveRenderer::initializeBase() {
     // OpenGL ES 3.0 Apple A7 GPU - 75.9.3
     // 3.0 Mesa 11.0.2
     // cerr << "got version: " << version_str << endl;
-    vector<string> parts = StringUtils::split(version_str);
+    vector<string> parts = splitWhitespace(version_str);
     if (parts.size() >= 2 && parts[0] == "OpenGL") {
       if (parts.size() >= 3 && parts[1] == "ES") {
 	float es_version = atof(parts[2].c_str());
